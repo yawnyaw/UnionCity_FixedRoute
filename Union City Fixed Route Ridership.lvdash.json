@@ -558,7 +558,8 @@
         "  MeanTotal,\n",
         "  CONCAT(Route, ' (', CAST(CAST(ROUND(SUM(MeanRidersOn) OVER (PARTITION BY Route), 0) AS INT) AS STRING), ')') AS RouteOn,\n",
         "  CONCAT(Route, ' (', CAST(CAST(ROUND(SUM(MeanRidersOff) OVER (PARTITION BY Route), 0) AS INT) AS STRING), ')') AS RouteOff,\n",
-        "  CONCAT(Route, ' (', CAST(CAST(ROUND(SUM(MeanTotal) OVER (PARTITION BY Route), 0) AS INT) AS STRING), ')') AS RouteTotal\n",
+        "  ROUND(MeanTotal / 2, 2) AS MeanRiders,\n",
+        "  CONCAT(Route, ' (', CAST(CAST(ROUND(SUM(MeanTotal / 2) OVER (PARTITION BY Route), 0) AS INT) AS STRING), ')') AS RouteRiders\n",
         "FROM\n",
         "  agg\n",
         "ORDER BY\n",
@@ -3953,21 +3954,21 @@
                   "datasetName": "uc_route_hour_mean",
                   "fields": [
                     {
-                      "name": "sum(MeanTotal)",
-                      "expression": "SUM(`MeanTotal`)"
+                      "name": "sum(MeanRiders)",
+                      "expression": "SUM(`MeanRiders`)"
                     },
                     {
                       "name": "Hour",
                       "expression": "`Hour`"
                     },
                     {
-                      "name": "RouteTotal",
-                      "expression": "`RouteTotal`"
+                      "name": "RouteRiders",
+                      "expression": "`RouteRiders`"
                     }
                   ],
                   "filters": [
                     {
-                      "expression": "`MeanTotal` > 0"
+                      "expression": "`MeanRiders` > 0"
                     }
                   ],
                   "disaggregated": false
@@ -3977,10 +3978,7 @@
             "spec": {
               "frame": {
                 "showTitle": true,
-                "title": {
-                  "value": "Mean Riders On+Off by Route & Hour",
-                  "fields": []
-                }
+                "title": "Mean Ridership by Route & Hour"
               },
               "version": 3,
               "widgetType": "heatmap",
@@ -3995,16 +3993,16 @@
                   }
                 },
                 "y": {
-                  "fieldName": "RouteTotal",
+                  "fieldName": "RouteRiders",
                   "axis": {
-                    "title": "Boards + Alights"
+                    "title": "Ridership"
                   },
                   "scale": {
                     "type": "categorical"
                   }
                 },
                 "color": {
-                  "fieldName": "sum(MeanTotal)",
+                  "fieldName": "sum(MeanRiders)",
                   "legend": {
                     "hide": true
                   },
